@@ -1,0 +1,26 @@
+[
+    {
+        "id": "1",
+        "name": "Ahorros"
+    },
+    {
+        "id": "2",
+        "name": "Donación/Sorteo"
+    },
+    {
+        "id": "3",
+        "name": "Venta de bien mueble"
+    },
+    {
+        "id": "4",
+        "name": "Venta de bien inmueble"
+    },
+    {
+        "id": "5",
+        "name": "Herencia"
+    },
+    {
+        "id": "6",
+        "name": "Préstamos"
+    }
+   ]
