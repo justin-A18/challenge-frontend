@@ -13,12 +13,14 @@ function createLoginForm() {
 
 function mountLoginForm() {
   let form!: ReturnType<typeof createLoginForm>;
-  const wrapper = mount(defineComponent({
-    setup() {
-      form = createLoginForm();
-      return () => null;
-    },
-  }));
+  const wrapper = mount(
+    defineComponent({
+      setup() {
+        form = createLoginForm();
+        return () => null;
+      },
+    }),
+  );
 
   return { form, wrapper };
 }

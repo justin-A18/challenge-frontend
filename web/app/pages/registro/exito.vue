@@ -3,5 +3,5 @@ import ProfileSuccess from '~/modules/onboarding/components/ProfileSuccess.vue';
 </script>
 
 <template>
-	<ProfileSuccess />
+  <ProfileSuccess />
 </template>

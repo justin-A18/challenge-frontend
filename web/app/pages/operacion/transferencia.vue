@@ -1,4 +1,7 @@
-<script setup lang="ts">import OperationView from '~/modules/transactions/components/OperationView.vue';</script>
+<script setup lang="ts">
+import OperationView from '~/modules/transactions/components/OperationView.vue';
+</script>
+
 <template>
-	<OperationView stage="transfer" />
+  <OperationView stage="transfer" />
 </template>

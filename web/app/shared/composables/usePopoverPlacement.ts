@@ -1,6 +1,7 @@
 import { nextTick, onBeforeUnmount, onMounted, shallowRef, watch, type Ref } from 'vue';
+import type { PopoverPlacement } from '~/shared/types/ui.types';
 
-export type PopoverPlacement = 'top' | 'bottom';
+export type { PopoverPlacement };
 
 export function usePopoverPlacement(
   trigger: Ref<HTMLElement | null>,
@@ -34,7 +35,7 @@ export function usePopoverPlacement(
     const belowFits = panelHeight <= spaceBelow;
     const aboveFits = panelHeight <= spaceAbove;
 
-    if (belowFits || !aboveFits && spaceBelow >= spaceAbove) {
+    if (belowFits || (!aboveFits && spaceBelow >= spaceAbove)) {
       placement.value = 'bottom';
       maxHeight.value = Math.max(1, Math.min(panelHeight, spaceBelow));
     } else {

@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { KAMBISTA_ENDPOINTS } from '../../../app/shared/constants/api';
-import { calculateExchange, getExchangeRates } from '../../../app/modules/transactions/services/exchange.service';
+import {
+  calculateExchange,
+  getExchangeRates,
+} from '../../../app/modules/transactions/services/exchange.service';
 
 afterEach(() => vi.unstubAllGlobals());
 

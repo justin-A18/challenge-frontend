@@ -255,9 +255,7 @@ const mutation = useMutation({
 Los callbacks inline están permitidos cuando sean pequeños, declarativos y no introduzcan complejidad innecesaria.
 
 ```typescript
-const activeUsers = computed(() =>
-  users.value.filter((user) => user.active),
-);
+const activeUsers = computed(() => users.value.filter((user) => user.active));
 
 const userNames = users.map((user) => user.name);
 ```

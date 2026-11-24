@@ -24,8 +24,14 @@ describe('Reglas del perfil', () => {
   it('valida el formato del documento según el tipo seleccionado', () => {
     expect(profileSchema.safeParse(profile).success).toBe(true);
     expect(profileSchema.safeParse({ ...profile, documentType: 'CE' }).success).toBe(false);
-    expect(profileSchema.safeParse({ ...profile, documentType: 'CE', documentNumber: '123456789' }).success).toBe(true);
-    expect(profileSchema.safeParse({ ...profile, documentType: 'PASAPORTE', documentNumber: 'AB123456' }).success).toBe(true);
+    expect(
+      profileSchema.safeParse({ ...profile, documentType: 'CE', documentNumber: '123456789' })
+        .success,
+    ).toBe(true);
+    expect(
+      profileSchema.safeParse({ ...profile, documentType: 'PASAPORTE', documentNumber: 'AB123456' })
+        .success,
+    ).toBe(true);
     expect(profileSchema.safeParse({ ...profile, firstName: 'María123' }).success).toBe(false);
   });
 

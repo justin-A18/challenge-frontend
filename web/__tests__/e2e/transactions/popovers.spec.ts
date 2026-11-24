@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { details, mockExchange, onboard } from '../helpers';
 
-test('mantiene limpio el selector de moneda y abre los popovers hacia arriba si hace falta', async ({ page }) => {
+test('mantiene limpio el selector de moneda y abre los popovers hacia arriba si hace falta', async ({
+  page,
+}) => {
   await mockExchange(page);
   await onboard(page);
 
@@ -15,7 +17,9 @@ test('mantiene limpio el selector de moneda y abre los popovers hacia arriba si 
   expect(currencyMenuBounds).not.toBeNull();
   expect(currencyBounds).not.toBeNull();
   expect(currencyMenuBounds!.y).toBeGreaterThanOrEqual(currencyBounds!.y + currencyBounds!.height);
-  await expect(page.getByRole('button', { name: 'Invertir monedas', exact: true })).not.toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Invertir monedas', exact: true }),
+  ).not.toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Invertir monedas', exact: true })).toBeVisible();
 

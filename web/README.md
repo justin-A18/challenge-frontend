@@ -26,10 +26,10 @@ npm run preview
 
 El servicio es simulado y solo acepta estas credenciales:
 
-| Campo | Credencial válida |
-|---|---|
-| Correo | demo@kambista.com |
-| Contraseña | Demo1234! |
+| Campo      | Credencial válida |
+| ---------- | ----------------- |
+| Correo     | demo@kambista.com |
+| Contraseña | Demo1234!         |
 
 Un correo o contraseña distintos muestran un error de credenciales. Al iniciar
 sesión se abre el formulario de perfil.
@@ -38,21 +38,21 @@ sesión se abre el formulario de perfil.
 
 Usa estos valores para completar el recorrido:
 
-| Campo | Valor de prueba |
-|---|---|
-| Nombres completos | María López |
-| Tipo y número de documento | DNI · 87654321 |
-| Celular | 987654321 |
-| Fecha de nacimiento | 1990-06-15 |
-| Términos y condiciones | Aceptados |
-| Política de datos | Opcional |
+| Campo                      | Valor de prueba |
+| -------------------------- | --------------- |
+| Nombres completos          | María López     |
+| Tipo y número de documento | DNI · 87654321  |
+| Celular                    | 987654321       |
+| Fecha de nacimiento        | 1990-06-15      |
+| Términos y condiciones     | Aceptados       |
+| Política de datos          | Opcional        |
 
 Casos de error simulados:
 
-| Campo | Valor que activa el error | Resultado |
-|---|---|---|
-| DNI | 12345678 con tipo DNI | `DUPLICATE_DNI` |
-| Celular | 999999999 | `INVALID_PHONE` |
+| Campo   | Valor que activa el error | Resultado       |
+| ------- | ------------------------- | --------------- |
+| DNI     | 12345678 con tipo DNI     | `DUPLICATE_DNI` |
+| Celular | 999999999                 | `INVALID_PHONE` |
 
 Las demás validaciones se ejecutan mientras se escribe: nombre con letras y
 espacios; DNI de 8 dígitos; CE de 9 dígitos; pasaporte alfanumérico de 8 a 15
@@ -124,10 +124,10 @@ continuar.
 
 La aplicación consume estos endpoints públicos:
 
-| Uso | Endpoint | Parámetros |
-|---|---|---|
-| Tasas actuales | `GET https://api.kambista.com/v1/exchange/kambista/current` | Ninguno |
-| Calcular operación | `GET https://api.kambista.com/v1/exchange/calculates` | `originCurrency`, `destinationCurrency`, `amount`, `active=S` |
+| Uso                | Endpoint                                                    | Parámetros                                                    |
+| ------------------ | ----------------------------------------------------------- | ------------------------------------------------------------- |
+| Tasas actuales     | `GET https://api.kambista.com/v1/exchange/kambista/current` | Ninguno                                                       |
+| Calcular operación | `GET https://api.kambista.com/v1/exchange/calculates`       | `originCurrency`, `destinationCurrency`, `amount`, `active=S` |
 
 El cálculo admite PEN → USD y USD → PEN. La respuesta se valida antes de
 utilizarse; `exchange` es el monto recibido y `savings.amount` el ahorro. No se

@@ -3,5 +3,5 @@ import ProfileView from '~/modules/onboarding/components/ProfileView.vue';
 </script>
 
 <template>
-	<ProfileView />
+  <ProfileView />
 </template>

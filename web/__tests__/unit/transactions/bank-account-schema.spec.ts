@@ -3,8 +3,15 @@ import { bankAccountSchema } from '../../../app/modules/transactions/schemas/ban
 
 describe('Validación de cuentas bancarias', () => {
   it('conserva ceros iniciales y rechaza caracteres no numéricos', () => {
-    const account = { bankId: '1', accountType: 'AHORRO', currency: 'PEN', accountNumber: '0012345678' };
+    const account = {
+      bankId: '1',
+      accountType: 'AHORRO',
+      currency: 'PEN',
+      accountNumber: '0012345678',
+    };
     expect(bankAccountSchema.parse(account).accountNumber).toBe('0012345678');
-    expect(bankAccountSchema.safeParse({ ...account, accountNumber: '001-234' }).success).toBe(false);
+    expect(bankAccountSchema.safeParse({ ...account, accountNumber: '001-234' }).success).toBe(
+      false,
+    );
   });
 });

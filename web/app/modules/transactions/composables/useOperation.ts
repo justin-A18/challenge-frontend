@@ -1,12 +1,18 @@
 import { computed, onMounted, onScopeDispose, shallowRef, watch } from 'vue';
-import { calculateExchange, getExchangeRates, isAbortError, type ExchangeRates, type ExchangeCalculation } from '../services/exchange.service';
+import {
+  calculateExchange,
+  getExchangeRates,
+  isAbortError,
+  type ExchangeRates,
+  type ExchangeCalculation,
+} from '../services/exchange.service';
+import { DEFAULT_QUOTE_DRAFT } from '../constants/draft';
+import type { QuoteInputs } from '../types/exchange.types';
 import { useOperationState } from './useOperationState';
 import type { Currency } from '~/shared/constants/currencies';
 
-type QuoteInputs = readonly [amount: number, origin: Currency, destination: Currency, refresh: number];
-
 export function useOperation() {
-  const draft = useState('quote-draft', () => ({ amount: 10000, origin: 'USD' as Currency, destination: 'PEN' as Currency }));
+  const draft = useState('quote-draft', () => ({ ...DEFAULT_QUOTE_DRAFT }));
   const rates = shallowRef<ExchangeRates | null>(null);
   const calculation = shallowRef<ExchangeCalculation | null>(null);
   const isCalculating = shallowRef(false);
@@ -21,7 +27,14 @@ export function useOperation() {
   const savings = computed(() => calculation.value?.savings ?? null);
   const destination = computed(() => draft.value.destination);
   const rate = computed(() => calculation.value?.rate ?? null);
-  const canContinue = computed(() => !!calculation.value && !!rates.value && !isCalculating.value && !quoteError.value && !ratesError.value);
+  const canContinue = computed(
+    () =>
+      !!calculation.value &&
+      !!rates.value &&
+      !isCalculating.value &&
+      !quoteError.value &&
+      !ratesError.value,
+  );
 
   async function loadRates() {
     ratesController?.abort();
@@ -95,11 +108,24 @@ export function useOperation() {
     if (draft.value.origin === origin && draft.value.destination === destination) return;
     draft.value = { ...draft.value, origin, destination };
   }
-  function swapCurrencies() { setCurrencyPair(draft.value.destination, draft.value.origin); }
-  function setOriginCurrency(currency: Currency) { if (currency !== draft.value.origin) swapCurrencies(); }
-  function setDestinationCurrency(currency: Currency) { if (currency !== draft.value.destination) swapCurrencies(); }
+  function swapCurrencies() {
+    setCurrencyPair(draft.value.destination, draft.value.origin);
+  }
+  function setOriginCurrency(currency: Currency) {
+    if (currency !== draft.value.origin) swapCurrencies();
+  }
+  function setDestinationCurrency(currency: Currency) {
+    if (currency !== draft.value.destination) swapCurrencies();
+  }
   async function startOperation() {
-    if (!calculation.value || isCalculating.value || quoteError.value || ratesError.value || !rates.value) return;
+    if (
+      !calculation.value ||
+      isCalculating.value ||
+      quoteError.value ||
+      ratesError.value ||
+      !rates.value
+    )
+      return;
     state.value = { quote: null, pendingQuote: { ...draft.value, ...calculation.value } };
     await navigateTo('/operacion');
   }
@@ -117,10 +143,23 @@ export function useOperation() {
   });
 
   return {
-    draft, rates, calculation, isCalculating, isLoadingRates, quoteError, ratesError, retry,
-    received, savings, destination, rate,
-    setOriginCurrency, setDestinationCurrency, setCurrencyPair, swapCurrencies, startOperation,
+    draft,
+    rates,
+    calculation,
+    isCalculating,
+    isLoadingRates,
+    quoteError,
+    ratesError,
+    retry,
+    received,
+    savings,
+    destination,
+    rate,
+    setOriginCurrency,
+    setDestinationCurrency,
+    setCurrencyPair,
+    swapCurrencies,
+    startOperation,
     canContinue,
   };
 }
-

@@ -1,7 +1,15 @@
 import { z } from 'zod';
 import { isAdult } from '../utils/isAdult';
 
-const nameSchema = z.string().trim().min(1, 'Completa este campo')
+const documentFormats = {
+  DNI: /^\d{8}$/, CE: /^\d{9}$/,
+  PASAPORTE: /^[a-zA-Z0-9]{8,15}$/
+};
+
+const nameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Completa este campo')
   .regex(/^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u, 'Usa solo letras y espacios');
 
 const profileFieldsSchema = z.object({
@@ -15,7 +23,6 @@ const profileFieldsSchema = z.object({
 });
 
 type ProfileFields = z.infer<typeof profileFieldsSchema>;
-const documentFormats = { DNI: /^\d{8}$/, CE: /^\d{9}$/, PASAPORTE: /^[a-zA-Z0-9]{8,15}$/ };
 
 function validateDocumentFormat(values: ProfileFields, context: z.RefinementCtx) {
   if (documentFormats[values.documentType].test(values.documentNumber)) return;

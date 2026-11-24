@@ -16,4 +16,3 @@ export const LEGAL_CONTENT = {
     ],
   },
 } as const;
-

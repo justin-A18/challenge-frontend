@@ -11,7 +11,11 @@ export function useOperationDetails() {
   const previous = state.value.quote;
   const form = useForm<OperationValues>({
     validationSchema: operationSchema,
-    initialValues: { bankId: previous?.bankId || '', destinationAccountId: previous?.account.id || '', sourceFundsId: previous?.sourceFundsId || '' },
+    initialValues: {
+      bankId: previous?.bankId || '',
+      destinationAccountId: previous?.account.id || '',
+      sourceFundsId: previous?.sourceFundsId || '',
+    },
   });
   const [bankId, bankAttrs] = form.defineField('bankId');
   const [destinationAccountId] = form.defineField('destinationAccountId');
@@ -24,10 +28,14 @@ export function useOperationDetails() {
     }
 
     const account = accounts.value.find(
-      item => item.id === values.destinationAccountId && item.currency === quote.value?.destination,
+      (item) =>
+        item.id === values.destinationAccountId && item.currency === quote.value?.destination,
     );
     if (!account) {
-      form.setFieldError('destinationAccountId', 'Selecciona una cuenta en la moneda que recibirás');
+      form.setFieldError(
+        'destinationAccountId',
+        'Selecciona una cuenta en la moneda que recibirás',
+      );
       return;
     }
 
@@ -45,6 +53,14 @@ export function useOperationDetails() {
 
   const next = form.handleSubmit(continueToTransfer);
 
-  return { quote, bankId, bankAttrs, destinationAccountId, sourceFundsId, sourceAttrs, errors: form.errors, next };
+  return {
+    quote,
+    bankId,
+    bankAttrs,
+    destinationAccountId,
+    sourceFundsId,
+    sourceAttrs,
+    errors: form.errors,
+    next,
+  };
 }
-

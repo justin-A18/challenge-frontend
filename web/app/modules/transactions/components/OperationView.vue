@@ -4,8 +4,11 @@ import OperationDetailsView from './OperationDetailsView.vue';
 import TransferView from './TransferView.vue';
 import VoucherView from './VoucherView.vue';
 import TransactionSuccessView from './TransactionSuccessView.vue';
-withDefaults(defineProps<{ stage?: 'quote' | 'details' | 'transfer' | 'voucher' | 'success' }>(), { stage: 'quote' });
+withDefaults(defineProps<{ stage?: 'quote' | 'details' | 'transfer' | 'voucher' | 'success' }>(), {
+  stage: 'quote',
+});
 </script>
+
 <template>
   <QuoteView v-if="stage === 'quote'" />
   <OperationDetailsView v-else-if="stage === 'details'" />
@@ -13,4 +16,3 @@ withDefaults(defineProps<{ stage?: 'quote' | 'details' | 'transfer' | 'voucher' 
   <VoucherView v-else-if="stage === 'voucher'" />
   <TransactionSuccessView v-else />
 </template>
-

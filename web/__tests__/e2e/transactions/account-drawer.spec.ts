@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { details, mockExchange, onboard } from '../helpers';
 
-test('abre el drawer de cuenta con una transición según el dispositivo', async ({ page }, testInfo) => {
+test('abre el drawer de cuenta con una transición según el dispositivo', async ({
+  page,
+}, testInfo) => {
   await mockExchange(page);
   await onboard(page);
   await details(page);
@@ -10,7 +12,9 @@ test('abre el drawer de cuenta con una transición según el dispositivo', async
     height: 520,
   });
   await page.getByRole('button', { name: 'CONTINUAR', exact: true }).click();
-  await page.getByRole('button', { name: '¿En qué cuenta deseas recibir tu dinero?', exact: true }).click();
+  await page
+    .getByRole('button', { name: '¿En qué cuenta deseas recibir tu dinero?', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Agregar cuenta', exact: true }).click();
 
   const drawer = page.getByRole('dialog', { name: 'Agregar cuenta - Soles' });

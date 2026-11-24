@@ -1,12 +1,15 @@
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   routeRules: {
-    '/registro': { ssr: false }, '/registro/**': { ssr: false },
-    '/inicio': { ssr: false }, '/operacion': { ssr: false }, '/operacion/**': { ssr: false },
+    '/registro': { ssr: false },
+    '/registro/**': { ssr: false },
+    '/inicio': { ssr: false },
+    '/operacion': { ssr: false },
+    '/operacion/**': { ssr: false },
   },
   alias: {
     '@mocks': fileURLToPath(new URL('../mocks/', import.meta.url)),
@@ -28,8 +31,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
 });

@@ -2,8 +2,14 @@
 import { onMounted, onBeforeUnmount, shallowRef, watch, useTemplateRef, useId } from 'vue';
 import UiIcon from './UiIcon.vue';
 import { lockDialogScroll, unlockDialogScroll } from '~/shared/utils/dialogScrollLock';
+const props = defineProps<{
+  title: string;
+  wide?: boolean;
+  drawer?: boolean;
+  accountPicker?: boolean;
+  subtitle?: string;
+}>();
 const open = defineModel<boolean>({ required: true });
-const props = defineProps<{ title: string; wide?: boolean; drawer?: boolean; accountPicker?: boolean; subtitle?: string }>();
 const dialog = useTemplateRef<HTMLDialogElement>('dialog');
 const closing = shallowRef(false);
 const id = useId();
@@ -35,9 +41,7 @@ function sync() {
     closing.value = true;
     closeTimer = setTimeout(
       finishClose,
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ? 1
-      : props.drawer ? 300 : 220,
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : props.drawer ? 300 : 220,
     );
   }
 }
@@ -45,7 +49,13 @@ function sync() {
 function backdrop(event: MouseEvent) {
   if (!dialog.value || event.target !== dialog.value) return;
   const bounds = dialog.value.getBoundingClientRect();
-  if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) open.value = false;
+  if (
+    event.clientX < bounds.left ||
+    event.clientX > bounds.right ||
+    event.clientY < bounds.top ||
+    event.clientY > bounds.bottom
+  )
+    open.value = false;
 }
 
 function handleDialogClose() {
@@ -65,17 +75,48 @@ onMounted(sync);
 watch(open, sync);
 onBeforeUnmount(cleanupDialog);
 </script>
+
 <template>
   <dialog
-ref="dialog" :aria-labelledby="id" class="ui-dialog fixed max-h-[94dvh] overflow-y-auto bg-white text-secondary backdrop:bg-black/60"
+    ref="dialog"
+    :aria-labelledby="id"
+    class="ui-dialog text-secondary fixed max-h-[94dvh] overflow-y-auto bg-white backdrop:bg-black/60"
     :class="[
-      drawer ? 'ui-dialog--drawer inset-x-0 bottom-0 top-auto m-0 w-full max-w-none rounded-t-[20px] md:bottom-0 md:left-auto md:right-0 md:top-0 md:max-h-dvh md:min-h-dvh md:w-[73%] md:rounded-l-control md:rounded-tr-none' : accountPicker ? 'ui-dialog--modal inset-x-0 bottom-0 top-auto m-0 w-full max-w-none rounded-t-[20px] md:inset-0 md:m-auto md:max-w-[406px] md:rounded-[12px]' : 'ui-dialog--modal inset-0 m-auto w-[calc(100%-2rem)] rounded-panel p-6 sm:p-8 ' + (wide ? 'max-w-4xl' : 'max-w-md'),
+      drawer
+        ? 'ui-dialog--drawer md:rounded-l-control inset-x-0 top-auto bottom-0 m-0 w-full max-w-none rounded-t-[20px] md:top-0 md:right-0 md:bottom-0 md:left-auto md:max-h-dvh md:min-h-dvh md:w-[73%] md:rounded-tr-none'
+        : accountPicker
+          ? 'ui-dialog--modal inset-x-0 top-auto bottom-0 m-0 w-full max-w-none rounded-t-[20px] md:inset-0 md:m-auto md:max-w-[406px] md:rounded-[12px]'
+          : 'ui-dialog--modal rounded-panel inset-0 m-auto w-[calc(100%-2rem)] p-6 sm:p-8 ' +
+            (wide ? 'max-w-4xl' : 'max-w-md'),
       closing ? 'ui-dialog--closing' : '',
     ]"
-    @cancel.prevent="open = false" @close="handleDialogClose" @click="backdrop">
-    <header class="flex items-start justify-between gap-4" :class="drawer ? 'border-b border-gray-25 px-6 py-5 md:px-11' : accountPicker ? 'bg-white px-6 py-5 md:bg-secondary md:text-white' : 'mb-6'">
-      <div><h2 :id="id" class="text-xl font-bold" :class="accountPicker ? 'md:text-2xl md:font-medium' : ''">{{ title }}</h2><p v-if="subtitle" class="mt-1 text-base">{{ subtitle }}</p></div>
-      <button type="button" aria-label="Cerrar" class="-mr-1 shrink-0 p-1" @click="open = false"><UiIcon name="close" :size="22" /></button>
+    @cancel.prevent="open = false"
+    @close="handleDialogClose"
+    @click="backdrop"
+  >
+    <header
+      class="flex items-start justify-between gap-4"
+      :class="
+        drawer
+          ? 'border-gray-25 border-b px-6 py-5 md:px-11'
+          : accountPicker
+            ? 'md:bg-secondary bg-white px-6 py-5 md:text-white'
+            : 'mb-6'
+      "
+    >
+      <div>
+        <h2
+          :id="id"
+          class="text-xl font-bold"
+          :class="accountPicker ? 'md:text-2xl md:font-medium' : ''"
+        >
+          {{ title }}
+        </h2>
+        <p v-if="subtitle" class="mt-1 text-base">{{ subtitle }}</p>
+      </div>
+      <button type="button" aria-label="Cerrar" class="-mr-1 shrink-0 p-1" @click="open = false">
+        <UiIcon name="close" :size="22" />
+      </button>
     </header>
     <slot />
   </dialog>
@@ -229,4 +270,3 @@ ref="dialog" :aria-labelledby="id" class="ui-dialog fixed max-h-[94dvh] overflow
   }
 }
 </style>
-
