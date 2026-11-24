@@ -20,31 +20,59 @@ npm run build
 npm run preview
 ```
 
-## Credenciales y datos de prueba
+## Datos de prueba
 
-El login mock acepta exclusivamente:
+### Inicio de sesión
 
-| Campo | Valor |
+El servicio es simulado y solo acepta estas credenciales:
+
+| Campo | Credencial válida |
 |---|---|
 | Correo | demo@kambista.com |
 | Contraseña | Demo1234! |
 
-Otro correo o contraseña produce un error de credenciales. El email se valida
-en tiempo real y la contraseña es obligatoria. Al entrar se abre completar perfil.
+Un correo o contraseña distintos muestran un error de credenciales. Al iniciar
+sesión se abre el formulario de perfil.
 
-| Campo del perfil | Ejemplo válido | Caso rechazado |
+### Perfil
+
+Usa estos valores para completar el recorrido:
+
+| Campo | Valor de prueba |
+|---|---|
+| Nombres completos | María López |
+| Tipo y número de documento | DNI · 87654321 |
+| Celular | 987654321 |
+| Fecha de nacimiento | 1990-06-15 |
+| Términos y condiciones | Aceptados |
+| Política de datos | Opcional |
+
+Casos de error simulados:
+
+| Campo | Valor que activa el error | Resultado |
 |---|---|---|
-| Nombres completos | María López | María123 o caracteres especiales |
-| DNI | 87654321 | Menos/más de 8 dígitos; 12345678 devuelve DUPLICATE_DNI |
-| CE | 123456789 | Longitud distinta de 9 dígitos |
-| Pasaporte | AB123456 | Menos de 8 o más de 15 caracteres alfanuméricos |
-| Celular | 987654321 | Longitud distinta de 9; 999999999 devuelve INVALID_PHONE |
-| Nacimiento | 1990-06-15 | Fecha inexistente, futura o menor de 18 años |
-| Términos | Marcados | Sin marcar impide continuar |
-| Política de datos | Opcional | Puede quedar sin marcar |
+| DNI | 12345678 con tipo DNI | `DUPLICATE_DNI` |
+| Celular | 999999999 | `INVALID_PHONE` |
 
-Los enlaces de términos y política abren modales independientes. Sus textos son
-demostrativos. Los errores mock siguen el contrato APIError del README principal.
+Las demás validaciones se ejecutan mientras se escribe: nombre con letras y
+espacios; DNI de 8 dígitos; CE de 9 dígitos; pasaporte alfanumérico de 8 a 15
+caracteres; celular de 9 dígitos; y fecha válida para una persona adulta. Los
+enlaces de términos y política abren modales con contenido demostrativo.
+
+### Operación
+
+- Los selectores de banco y origen de fondos usan los datos de
+  [`mocks/bankAccounts.json`](../mocks/bankAccounts.json) y
+  [`mocks/sourceFunds.json`](../mocks/sourceFunds.json), respectivamente.
+- Para probar una cuenta receptora, selecciona **BCP**, tipo **Ahorros** o
+  **Corriente**, moneda de destino, número `001234567890` y alias opcional
+  `Mi BCP`. Marca la declaración de titularidad.
+- El número de cuenta se conserva como texto para mantener ceros iniciales.
+  Las cuentas disponibles se filtran por la moneda que recibirá el usuario.
+- Se aceptan constancias PNG, JPEG, WebP, PDF, DOC y DOCX de hasta 10 MB.
+- La cuenta de Kambista mostrada en la transferencia (`20101000000000`,
+  RUC `20601708141`, titular `Kambista SAC`) es un dato demostrativo tomado
+  de la referencia visual. No debe usarse para hacer pagos reales.
 
 ## Recorrido de operación
 
@@ -63,52 +91,47 @@ demostrativos. Los errores mock siguen el contrato APIError del README principal
 9. Revisa el resumen y vuelve a Inicio. En desktop, el menú del nombre contiene
    Cerrar sesión; en móvil está dentro del menú principal.
 
-Las cuentas se filtran por la moneda que recibirás. El número permanece como
-texto para conservar ceros iniciales. Si cambias la moneda y no tienes una cuenta
-compatible, debes crear una antes de continuar.
+Si cambias la moneda y no tienes una cuenta compatible, debes crear una antes de
+continuar.
 
-## APIs y persistencia
+## Decisiones técnicas
 
-- Los servicios de cotización consultan directamente
-  `https://api.kambista.com/v1/exchange/kambista/current` y
-  `https://api.kambista.com/v1/exchange/calculates`, enviando
-  `originCurrency`, `destinationCurrency`, `amount` y `active=S`.
-- No se utiliza un BFF de Nuxt para estas solicitudes; el navegador requiere
-  que la API de Kambista permita solicitudes CORS desde el origen de la app.
-- Bancos y orígenes se importan directamente desde `../mocks` con el alias
-  `@mocks`.
-- Las cuentas se guardan en localStorage con formato versionado, bajo
-  `kambista.accounts.v1:<correo>`.
-- Sesión y operación activa se guardan en sessionStorage. Las pantallas posteriores
-  utilizan la cotización confirmada, sin recalcularla al navegar o recargar.
-- Cerrar sesión borra sesión y operación; conserva las cuentas guardadas.
-- Los archivos solo viven en memoria; no se guardan en localStorage ni se suben.
+- **Módulos por dominio:** `auth`, `onboarding` y `transactions` encapsulan
+  componentes, composables, servicios, schemas, tipos y constantes. Las páginas
+  de Nuxt se limitan a conectar las vistas; la lógica de formularios y operaciones
+  vive en sus módulos.
+- **Formularios tipados:** Vee Validate gestiona el estado de los formularios y
+  Zod define sus reglas. Los tipos TypeScript se infieren de esos schemas.
+- **Estado y persistencia acotados:** `useState` comparte el estado de sesión y
+  operación compatible con Nuxt. La sesión y la operación activa se persisten en
+  `sessionStorage`; las cuentas guardadas se aíslan por correo en `localStorage`
+  mediante la clave versionada `kambista.accounts.v1:<correo>`. Cerrar sesión
+  limpia la sesión y la operación, pero conserva las cuentas.
+- **Cotizaciones consistentes:** el cálculo se demora 300 ms mientras el usuario
+  escribe y se cancela la solicitud anterior con `AbortController`. Solo la
+  respuesta vigente actualiza el resultado. Si falla la API, se muestra el error,
+  se ofrece reintentar y no se inventan tasas de respaldo.
+- **Mocks explícitos:** autenticación y registro simulan éxito y errores conocidos;
+  bancos y orígenes de fondos vienen de los JSON del reto. No se simulan APIs de
+  transferencias ni carga de constancias.
+- **Seguridad de la demostración:** el middleware protege las rutas para el flujo
+  de navegación, pero el login y los datos del navegador no constituyen
+  autenticación segura para producción. La cuenta de Kambista y los datos
+  bancarios son fixtures; los archivos adjuntos solo permanecen en memoria y no
+  se guardan ni se envían.
 
-**Datos demostrativos:** no existen APIs de autenticación, registro, cuentas,
-transferencias o carga de archivos. La cuenta receptora de Kambista, RUC, titular
-y tipo de cuenta provienen de la referencia visual y se reutilizan como fixture
-para los bancos. No deben utilizarse para realizar pagos reales.
+## APIs
 
-Si la API de cotización falla, se muestra un mensaje con Reintentar y se bloquea
-Iniciar operación. No se inventan tasas ni ahorros de respaldo.
+La aplicación consume estos endpoints públicos:
 
-## Arquitectura y decisiones
+| Uso | Endpoint | Parámetros |
+|---|---|---|
+| Tasas actuales | `GET https://api.kambista.com/v1/exchange/kambista/current` | Ninguno |
+| Calcular operación | `GET https://api.kambista.com/v1/exchange/calculates` | `originCurrency`, `destinationCurrency`, `amount`, `active=S` |
 
-- Módulos `auth`, `onboarding` y `transactions`; lógica en composables,
-  servicios, schemas, tipos inferidos y constantes por dominio.
-- Primitivas visuales y estado de sesión en `app/shared`. Tailwind 4 define los
-  tokens de color, fuente y radios. Se usan imágenes originales, sin Lucide.
-- Vee Validate v5 recibe directamente schemas Zod; los tipos se derivan del schema
-  antes de pasarlos a useForm.
-- Cada pantalla de operación tiene su propio componente. Los overlays usan dialog
-  nativo para gestionar foco, Escape y bloqueo del fondo.
-- Las vistas protegidas se renderizan en cliente porque sus datos mock viven en
-  almacenamiento del navegador. Los guardas son parte de la demostración, no un
-  mecanismo de autenticación seguro para producción.
-- Las solicitudes de cálculo usan debounce y AbortController; solo la respuesta
-  vigente puede actualizar el resultado. Una cancelación no muestra un error.
-- La referencia incluye cupones y ejemplos de cuentas/importes. Los importes y
-  cuentas del flujo son reales dentro del mock; no se simulan descuentos del cupón.
+El cálculo admite PEN → USD y USD → PEN. La respuesta se valida antes de
+utilizarse; `exchange` es el monto recibido y `savings.amount` el ahorro. No se
+utilizan Axios ni endpoints propios de Nuxt para este flujo.
 
 ## Validaciones automatizadas
 
@@ -134,25 +157,3 @@ La prueba externa se activa expresamente; no utiliza interceptores:
 $env:RUN_LIVE_API = '1'
 npm run test:e2e -- __tests__/e2e/live.spec.ts --project=desktop
 ```
-
-## Referencias y evidencia visual
-
-[DESIGN-REFERENCE-MAP.md](DESIGN-REFERENCE-MAP.md) inventaría los 70 PNG y sus
-dimensiones, rutas y estados. Las referencias permanecen intactas.
-
-```bash
-npm run design:map
-npm run test:e2e -- __tests__/e2e/visual.spec.ts
-npm run design:report
-```
-
-El informe se genera en `.cache/visual/index.html`: referencia, captura y mapa
-de diferencias por pantalla y dispositivo. También se guardan capturas en el
-reporte Playwright y trazas de los fallos.
-
-Las barras del dispositivo se excluyen de la comparación móvil. Las métricas
-actuales son diferencias crudas: incluyen importes, nombre, número de cuentas y
-textos de negocio que difieren de los ejemplos estáticos. Las pruebas de captura
-comprueban imágenes cargadas y ausencia de desbordamiento; **no certifican igualdad
-píxel a píxel**. El informe permite revisar esas diferencias sin reemplazar las
-referencias originales.
