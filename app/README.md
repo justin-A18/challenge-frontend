@@ -1,56 +1,75 @@
-# Welcome to your Expo app 👋
+# Kambista React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil del reto Kambista implementada con Expo Router, React Native, NativeWind,
+React Hook Form, Yup y Zustand. La navegación cubre inicio de sesión, registro, cotización,
+registro de cuentas, transferencia y envío de constancia.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Desarrollo
 
 ```bash
-npm run reset-project
+npm install
+npm run start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Para abrir la aplicación en plataformas específicas:
+```bash
+npm run android
+npm run ios
+npm run web
+```
 
-### Other setup steps
+El inicio de sesión y el registro son simulados. Usa `demo@kambista.com` y `Demo1234!` para
+ingresar; para revisar los errores definidos por el reto, usa DNI `12345678` o celular
+`999999999`.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Servicios y datos de prueba
 
-## Learn more
+- La cotización consume `GET https://api.kambista.com/v1/exchange/kambista/current`.
 
-To learn more about developing your project with Expo, look at the following resources:
+- El cálculo consume `GET https://api.kambista.com/v1/exchange/calculates`, enviando
+  `originCurrency`, `destinationCurrency`, `amount` y `active=S`.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Los bancos y orígenes de fondos se leen de `../mocks/bankAccounts.json` y
+  `../mocks/sourceFunds.json`.
 
-## Join the community
+- Las cuentas bancarias y el estado de la operación se mantienen en Zustand durante la sesión.
 
-Join our community of developers creating universal apps.
+- La constancia se selecciona con el selector de documentos nativo; el flujo de demostración
+  conserva la metadata en memoria, ya que el reto no define un endpoint para subir archivos.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Android APK
+
+El perfil `preview` de [eas.json](./eas.json) está configurado para generar un APK instalable:
+```bash
+npx eas-cli build --platform android --profile preview
+```
+
+La creación del APK requiere que la cuenta de Expo y el proyecto EAS estén configurados para
+este repositorio.
+
+## Organización del comportamiento
+
+Los hooks de cada módulo coordinan formularios, navegación, servicios y stores. Los campos
+reutilizables usan React Hook Form directamente y conservan sus interacciones visuales locales.
+Los tipos y helpers exclusivos de una primitiva compartida se mantienen junto a ella.
+
+La recomendación de 80 líneas admite excepciones en la composición de la calculadora,
+el ciclo de cotización y el calendario. Sus estados forman una sola interacción coherente.
+En cotización, mantener juntas la cancelación, el debounce y la comprobación de la respuesta
+vigente permite revisar las condiciones de carrera en un solo lugar. La selección temporal,
+la navegación de meses y la confirmación del calendario se revisan como un único flujo.
+Estas excepciones priorizan la cohesión y evitan wrappers que solo trasladan llamadas.
+
+## Verificación local
+
+Ejecutar desde la raíz del repositorio.
+
+```bash
+node app/node_modules/typescript/bin/tsc --noEmit -p app --noUnusedLocals --noUnusedParameters
+npm --prefix app run lint
+```
+
+Las pantallas y componentes utilizan PascalCase, los hooks coinciden con el nombre
+camelCase de su función y las carpetas propias usan kebab-case. Los archivos auxiliares
+se colocan junto al componente que los utiliza. Cada módulo expone su API mediante
+exports explícitos en index.ts.
