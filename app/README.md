@@ -50,6 +50,10 @@ Para la fecha, abre el calendario, pulsa el mes o el año del encabezado y elige
 Puedes buscar el año por sus dígitos. Selecciona el día y pulsa **Aceptar**. **Cancelar**
 y **Cerrar** conservan el dato anterior.
 
+El selector ofrece años desde 1900 hasta el actual y permite fechas hasta hoy.
+La mayoría de edad se valida en el formulario, mostrando un error si la fecha
+corresponde a una persona menor de 18 años.
+
 ### Operación
 
 - Los bancos y orígenes de fondos provienen de [bankAccounts.json](../mocks/bankAccounts.json)
@@ -91,6 +95,10 @@ Si inviertes la dirección, se ofrecen las cuentas de la nueva moneda de destino
   el nombre y tamaño de la constancia durante la operación.
 
 ## APIs
+
+Se conserva Montserrat con su archivo de licencia OFL-1.1. La aprobación de
+OFL-1.1 y de MPL-2.0 (Lightning CSS, requerido por el tooling de Expo y
+NativeWind) sigue pendiente del responsable de la política de Kambista.
 
 | Uso | Endpoint | Parámetros |
 | --- | --- | --- |

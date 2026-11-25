@@ -124,6 +124,10 @@ continuar.
 
 ## APIs
 
+Se conserva Montserrat mediante `@fontsource/montserrat`, con licencia OFL-1.1.
+La aprobación de OFL-1.1 y de MPL-2.0 (Lightning CSS, incorporado por el tooling
+de Nuxt, Vite y Tailwind) sigue pendiente del responsable de la política de Kambista.
+
 La aplicación consume estos endpoints públicos:
 
 | Uso                | Endpoint                                                    | Parámetros                                                    |
