@@ -10,6 +10,7 @@ import {
 } from 'vue';
 import { usePopoverPlacement } from '~/shared/composables/usePopoverPlacement';
 import {
+  civilDate,
   WEEKDAYS,
   MONTH_OPTIONS,
   getYearOptions,
@@ -34,13 +35,13 @@ const visibleMonth = shallowRef(new Date(new Date().getFullYear(), new Date().ge
 const inputValue = shallowRef('');
 const weekdays = WEEKDAYS;
 const monthOptions = MONTH_OPTIONS;
-const yearOptions = getYearOptions();
+const yearOptions = shallowRef(getYearOptions());
 const { placement, positioned } = usePopoverPlacement(trigger, popup, open);
 
 function syncInputFromModel(value: string) {
   const date = parseDate(value);
   inputValue.value = date ? toDisplay(date) : '';
-  if (date) visibleMonth.value = new Date(date.getFullYear(), date.getMonth(), 1);
+  if (date) visibleMonth.value = civilDate(date.getFullYear(), date.getMonth(), 1);
 }
 watch(model, syncInputFromModel, { immediate: true });
 
@@ -48,9 +49,10 @@ const days = computed(() => getCalendarDays(visibleMonth.value, model.value));
 
 function showCalendar() {
   if (open.value) return;
+  yearOptions.value = getYearOptions();
   const selected = parseDate(model.value);
   const current = selected ?? new Date();
-  visibleMonth.value = new Date(current.getFullYear(), current.getMonth(), 1);
+  visibleMonth.value = civilDate(current.getFullYear(), current.getMonth(), 1);
   open.value = true;
 }
 
@@ -59,7 +61,7 @@ function updateInput(event: Event) {
   inputValue.value = value;
   const date = parseDate(value);
   model.value = date ? toIso(date) : '';
-  if (date) visibleMonth.value = new Date(date.getFullYear(), date.getMonth(), 1);
+  if (date) visibleMonth.value = civilDate(date.getFullYear(), date.getMonth(), 1);
 }
 
 function normalizeInput() {
@@ -75,15 +77,16 @@ function selectDay(date: Date) {
 }
 
 function changeMonth(offset: number) {
-  visibleMonth.value = new Date(
+  const nextMonth = civilDate(
     visibleMonth.value.getFullYear(),
     visibleMonth.value.getMonth() + offset,
     1,
   );
+  if (nextMonth.getFullYear() >= 1) visibleMonth.value = nextMonth;
 }
 
 function setMonth(event: Event) {
-  visibleMonth.value = new Date(
+  visibleMonth.value = civilDate(
     visibleMonth.value.getFullYear(),
     Number((event.target as HTMLSelectElement).value),
     1,
@@ -91,7 +94,7 @@ function setMonth(event: Event) {
 }
 
 function setYear(event: Event) {
-  visibleMonth.value = new Date(
+  visibleMonth.value = civilDate(
     Number((event.target as HTMLSelectElement).value),
     visibleMonth.value.getMonth(),
     1,
@@ -197,6 +200,7 @@ onBeforeUnmount(unregisterOutsidePointerListener);
           <button
             type="button"
             aria-label="Mes anterior"
+            :disabled="visibleMonth.getFullYear() === 1 && visibleMonth.getMonth() === 0"
             class="text-gray-60 hover:bg-gray-20 hover:text-secondary grid size-7 place-items-center rounded-full transition-colors"
             @click="changeMonth(-1)"
           >
@@ -247,7 +251,7 @@ onBeforeUnmount(unregisterOutsidePointerListener);
             :aria-label="day.label"
             :aria-current="day.today ? 'date' : undefined"
             :aria-pressed="day.selected"
-            :disabled="day.future"
+            :disabled="day.future || day.date.getFullYear() < 1"
             class="focus-visible:ring-info grid size-7 place-items-center rounded-full text-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-30"
             :class="
               day.selected

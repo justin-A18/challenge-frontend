@@ -6,13 +6,16 @@
       "@/*": ["./src/*"],
       "@mocks/*": ["../mocks/*"],
       "@/assets/*": ["./assets/*"]
-    }
+    },
+    "types": ["jest", "node"]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
   ]
 }

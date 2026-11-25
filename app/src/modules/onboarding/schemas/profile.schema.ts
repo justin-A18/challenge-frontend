@@ -5,7 +5,7 @@ export const DOCUMENT_TYPES = ["DNI", "CE", "PASAPORTE"] as const;
 
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
 
-const namePattern = /^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u;
+const namePattern = /^(?:\p{L}\p{M}*)+(?: +(?:\p{L}\p{M}*)+)*$/u;
 
 export const profileSchema = yup.object({
   firstName: yup
@@ -49,10 +49,7 @@ export const profileSchema = yup.object({
     .boolean()
     .oneOf([true], "Acepta los términos para continuar")
     .required(),
-  acceptPrivacy: yup
-    .boolean()
-    .oneOf([true], "Acepta la política de tratamiento de datos personales")
-    .required(),
+  acceptPrivacy: yup.boolean().default(false),
 });
 
 export type ProfileFormValues = yup.InferType<typeof profileSchema>;

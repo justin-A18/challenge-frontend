@@ -57,7 +57,9 @@ Casos de error simulados:
 Las demás validaciones se ejecutan mientras se escribe: nombre con letras y
 espacios; DNI de 8 dígitos; CE de 9 dígitos; pasaporte alfanumérico de 8 a 15
 caracteres; celular de 9 dígitos; y fecha válida para una persona adulta. Los
-enlaces de términos y política abren modales con contenido demostrativo.
+enlaces de términos y política abren modales con contenido demostrativo. El
+selector de fecha incluye años hasta el actual y no permite fechas futuras; el
+formulario sigue rechazando fechas que no cumplan la mayoría de edad.
 
 ### Operación
 
@@ -138,9 +140,22 @@ utilizan Axios ni endpoints propios de Nuxt para este flujo.
 ```bash
 npm run typecheck
 npm run test:unit
+npm run test:coverage
+npm run lint
 npm run test:e2e
 npm run test:e2e:report
 ```
+
+Vitest ejecuta las pruebas unitarias con Vue Test Utils. `__tests__/unit/`
+refleja la estructura de `app/`, con `modules/`, `middleware/` y `shared/`.
+Los archivos están separados por schema, servicio, composable o componente.
+El reporte se genera en `coverage/`.
+
+Los recorridos completos se prueban con Playwright en `__tests__/e2e/`, organizado
+con la misma estructura. Los helpers compartidos están en `__tests__/e2e/support/`.
+Se comprueban las rutas reales y el middleware del navegador. HTTP usa respuestas
+simuladas para que los escenarios sean reproducibles. La cobertura de Vitest
+corresponde a las unitarias y se complementa con los E2E.
 
 Playwright usa Google Chrome instalado, inicia su propio servidor en el puerto
 3100 y aísla sus archivos de Nuxt en `.cache/nuxt-e2e`. Si no tienes Chrome,
@@ -155,5 +170,5 @@ La prueba externa se activa expresamente; no utiliza interceptores:
 
 ```powershell
 $env:RUN_LIVE_API = '1'
-npm run test:e2e -- __tests__/e2e/live.spec.ts --project=desktop
+npm run test:e2e -- __tests__/e2e/modules/transactions/services/exchange-live.spec.ts --project=desktop
 ```

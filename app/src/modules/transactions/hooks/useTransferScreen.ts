@@ -17,8 +17,10 @@ export function useTransferScreen() {
 
   async function handleCopy(label: string, value: string) {
     setCopyError("");
+    setCopiedField("");
     try {
-      await Clipboard.setStringAsync(value);
+      const copied = await Clipboard.setStringAsync(value);
+      if (!copied) throw new Error("No pudimos copiar el dato seleccionado.");
       setCopiedField(label);
     } catch (error) {
       setCopyError(

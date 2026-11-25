@@ -39,6 +39,7 @@ export async function calculateExchange(
   signal?: AbortSignal,
 ): Promise<ExchangeCalculation> {
   if (origin === destination) throw new Error('Selecciona monedas diferentes.');
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Ingresa un monto mayor a cero.');
   try {
     const result = calculationSchema.parse(
       await $fetch(KAMBISTA_ENDPOINTS.calculateExchange, {

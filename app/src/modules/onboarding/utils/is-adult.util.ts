@@ -5,7 +5,9 @@ export function isAdult(value: string, today = new Date()) {
   const year = Number(yearText);
   const month = Number(monthText);
   const day = Number(dayText);
-  const birthDate = new Date(year, month - 1, day);
+  if (year === 0) return false;
+  const birthDate = new Date(0);
+  birthDate.setFullYear(year, month - 1, day);
 
   if (
     birthDate.getFullYear() !== year ||

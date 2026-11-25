@@ -35,7 +35,17 @@ export function useProfileScreen() {
   const documentType = useWatch({ control, name: "documentType" });
   async function handleProfile(values: ProfileFormValues) {
     setServiceError(null);
-    const result = await createProfile(values);
+    let result: Awaited<ReturnType<typeof createProfile>>;
+    try {
+      result = await createProfile(values);
+    } catch {
+      setServiceError({
+        name: "SERVER_ERROR",
+        title: "No pudimos guardar tus datos",
+        message: "Intenta nuevamente en unos minutos.",
+      });
+      return;
+    }
     if (!result.success) {
       setServiceError(result.data);
       return;

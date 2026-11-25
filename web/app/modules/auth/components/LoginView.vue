@@ -76,7 +76,9 @@ const help = shallowRef(false);
           <p v-if="serviceError" role="alert" class="text-danger mt-3 text-center text-xs">
             {{ serviceError }}
           </p>
-          <UiButton class="mt-8 w-full" :disabled="isSubmitting">INICIAR SESIÓN</UiButton>
+          <UiButton type="submit" class="mt-8 w-full" :disabled="isSubmitting">
+            INICIAR SESIÓN
+          </UiButton>
         </form>
       </div>
     </section>

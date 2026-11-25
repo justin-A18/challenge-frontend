@@ -44,3 +44,5 @@ example
 
 # IA
 .agents
+# Test coverage
+coverage/

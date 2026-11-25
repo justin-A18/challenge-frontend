@@ -3,7 +3,9 @@ export function isAdult(value: string, today = new Date()): boolean {
 
   const [year, month, day] = value.split('-').map(Number) as [number, number, number];
 
-  const date = new Date(year, month - 1, day);
+  if (year === 0) return false;
+  const date = new Date(0);
+  date.setFullYear(year, month - 1, day);
 
   if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return false;
 

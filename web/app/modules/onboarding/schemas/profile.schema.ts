@@ -10,7 +10,7 @@ const nameSchema = z
   .string()
   .trim()
   .min(1, 'Completa este campo')
-  .regex(/^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u, 'Usa solo letras y espacios');
+  .regex(/^(?:\p{L}\p{M}*)+(?: +(?:\p{L}\p{M}*)+)*$/u, 'Usa solo letras y espacios');
 
 const profileFieldsSchema = z.object({
   firstName: nameSchema,
@@ -19,7 +19,7 @@ const profileFieldsSchema = z.object({
   phone: z.string().regex(/^\d{9}$/, 'Ingresa un celular de 9 dígitos'),
   birthDate: z.string().refine(isAdult, 'Ingresa una fecha válida; debes ser mayor de edad'),
   acceptTerms: z.boolean().refine(Boolean, 'Acepta los términos para continuar'),
-  acceptPrivacy: z.boolean(),
+  acceptPrivacy: z.boolean().default(false),
 });
 
 type ProfileFields = z.infer<typeof profileFieldsSchema>;

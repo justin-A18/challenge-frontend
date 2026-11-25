@@ -19,7 +19,7 @@ export function useVoucher() {
       error.value = result.error.issues[0]?.message || 'Selecciona tu constancia';
       return;
     }
-    if (!state.value.quote?.transferred) return;
+    if (!state.value.quote?.transferred || state.value.quote.submitted) return;
     state.value.quote.submitted = true;
     await navigateTo('/operacion/exito');
   }

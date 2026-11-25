@@ -5,9 +5,16 @@ export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, month) => ({
   label: new Intl.DateTimeFormat('es-PE', { month: 'long' }).format(new Date(2020, month, 1)),
 }));
 
-export function getYearOptions(yearsBack = 100): number[] {
+export function getYearOptions(): number[] {
   const currentYear = new Date().getFullYear();
-  return Array.from({ length: yearsBack + 1 }, (_, offset) => currentYear - offset);
+  return Array.from({ length: currentYear }, (_, offset) => currentYear - offset);
+}
+
+export function civilDate(year: number, month: number, day: number) {
+  const date = new Date(0);
+  date.setHours(0, 0, 0, 0);
+  date.setFullYear(year, month, day);
+  return date;
 }
 
 export function parseDate(value: string): Date | null {
@@ -18,14 +25,14 @@ export function parseDate(value: string): Date | null {
   const day = Number(iso?.[3] ?? localized?.[1]);
   if (!year || !month || !day) return null;
 
-  const date = new Date(year, month - 1, day);
+  const date = civilDate(year, month - 1, day);
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
     ? date
     : null;
 }
 
 export function toIso(date: Date): string {
-  const year = date.getFullYear();
+  const year = String(date.getFullYear()).padStart(4, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
@@ -34,7 +41,7 @@ export function toIso(date: Date): string {
 export function toDisplay(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
+  const year = String(date.getFullYear()).padStart(4, '0');
   return `${day}/${month}/${year}`;
 }
 
@@ -56,7 +63,7 @@ export function getCalendarDay(
   today: string,
   selected: string,
 ): CalendarDay {
-  const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + index);
+  const date = civilDate(start.getFullYear(), start.getMonth(), start.getDate() + index);
   const iso = toIso(date);
   return {
     date,
@@ -78,12 +85,12 @@ export function getCalendarDay(
 export function getCalendarDays(visibleMonth: Date, selectedIso: string): CalendarDay[] {
   const year = visibleMonth.getFullYear();
   const month = visibleMonth.getMonth();
-  const firstDay = new Date(year, month, 1);
+  const firstDay = civilDate(year, month, 1);
   const mondayOffset = (firstDay.getDay() + 6) % 7;
-  const start = new Date(year, month, 1 - mondayOffset);
+  const start = civilDate(year, month, 1 - mondayOffset);
   const today = toIso(new Date());
 
-  const dayCount = new Date(year, month + 1, 0).getDate();
+  const dayCount = civilDate(year, month + 1, 0).getDate();
   const weekCount = Math.ceil((mondayOffset + dayCount) / 7);
   return Array.from({ length: weekCount * 7 }, (_, index) =>
     getCalendarDay(index, start, month, today, selectedIso),

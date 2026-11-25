@@ -22,7 +22,17 @@ export function useLoginScreen() {
   });
   async function handleLogin(values: LoginFormValues) {
     setServiceError(null);
-    const result = await signIn(values);
+    let result: Awaited<ReturnType<typeof signIn>>;
+    try {
+      result = await signIn(values);
+    } catch {
+      setServiceError({
+        name: "SERVER_ERROR",
+        title: "No pudimos iniciar sesión",
+        message: "Intenta nuevamente.",
+      });
+      return;
+    }
     if (!result.success) {
       setServiceError(result.data);
       return;

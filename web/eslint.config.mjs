@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/.output/**',
       '**/dist/**',
       '**/playwright-report/**',
+      '**/coverage/**',
       '**/.cache/**',
       '**/*.log',
       '**/*.tsbuildinfo',
