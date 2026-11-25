@@ -19,6 +19,7 @@ export function FormDatePicker<TForm extends FieldValues>({
   control,
   name,
   label,
+  minimumDate,
   maximumDate,
   initialDate,
 }: FormDatePickerProps<TForm>) {
@@ -37,6 +38,7 @@ export function FormDatePicker<TForm extends FieldValues>({
     handleSelectYear,
     draft,
     dateLimit,
+    dateStart,
     shownMonth,
     calendarCells,
     displayValue,
@@ -49,6 +51,7 @@ export function FormDatePicker<TForm extends FieldValues>({
     value: field.value,
     onChange: field.onChange,
     onBlur: field.onBlur,
+    minimumDate,
     maximumDate,
     initialDate,
   });
@@ -116,8 +119,10 @@ export function FormDatePicker<TForm extends FieldValues>({
         {view === "months" &&
           MONTHS.map((month, index) => {
             const disabled =
-              shownMonth.getFullYear() === dateLimit.getFullYear() &&
-              index > dateLimit.getMonth();
+              (shownMonth.getFullYear() === dateLimit.getFullYear() &&
+                index > dateLimit.getMonth()) ||
+              (shownMonth.getFullYear() === dateStart.getFullYear() &&
+                index < dateStart.getMonth());
             return (
               <Pressable
                 key={month}
@@ -271,7 +276,8 @@ export function FormDatePicker<TForm extends FieldValues>({
                           : null;
                         const selected =
                           date && draft ? sameDay(date, draft) : false;
-                        const disabled = !date || date > dateLimit;
+                        const disabled =
+                          !date || date < dateStart || date > dateLimit;
                         return (
                           <Pressable
                             key={dayIndex}

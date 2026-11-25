@@ -8,22 +8,17 @@ export function BirthDateField({
   control: Control<ProfileFormValues>;
 }) {
   const today = new Date();
-  const cutoffYear = today.getFullYear() - 18;
-  const lastDayOfMonth = new Date(
-    cutoffYear,
-    today.getMonth() + 1,
-    0,
-  ).getDate();
   const maximumDate = new Date(
-    cutoffYear,
+    today.getFullYear(),
     today.getMonth(),
-    Math.min(today.getDate(), lastDayOfMonth),
+    today.getDate(),
   );
   return (
     <FormDatePicker
       control={control}
       name="birthDate"
       label="Fecha de nacimiento"
+      minimumDate={new Date(1900, 0, 1)}
       maximumDate={maximumDate}
     />
   );

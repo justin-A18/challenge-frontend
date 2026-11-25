@@ -6,6 +6,7 @@ export function useDatePicker({
   value,
   onChange,
   onBlur,
+  minimumDate,
   maximumDate,
   initialDate,
 }: DatePickerOptions) {
@@ -15,17 +16,21 @@ export function useDatePicker({
   const [view, setView] = useState<"days" | "months" | "years">("days");
   const [yearQuery, setYearQuery] = useState("");
   const dateLimit = maximumDate ?? civilDate(9999, 11, 31);
+  const dateStart = minimumDate ?? civilDate(1, 0, 1);
+  const firstYear = dateStart.getFullYear();
+  const firstMonth = dateStart.getMonth();
   const year = shownMonth.getFullYear();
   const month = shownMonth.getMonth();
   const lastYear = dateLimit.getFullYear();
   const lastMonth = dateLimit.getMonth();
-  const canGoBack = year > 1 || month > 0;
+  const canGoBack = year > firstYear || month > firstMonth;
   const canGoForward = year < lastYear || month < lastMonth;
   const years =
     view === "years"
-      ? Array.from({ length: lastYear }, (_, index) => lastYear - index).filter(
-          (option) => String(option).padStart(4, "0").includes(yearQuery),
-        )
+      ? Array.from(
+          { length: Math.max(0, lastYear - firstYear + 1) },
+          (_, index) => lastYear - index,
+        ).filter((option) => String(option).padStart(4, "0").includes(yearQuery))
       : [];
   const firstWeekday = (shownMonth.getDay() + 6) % 7;
   const daysInMonth = civilDate(
@@ -44,9 +49,18 @@ export function useDatePicker({
     : "DD/MM/AAAA";
   function handleOpenPicker() {
     const startDate = currentValue ?? initialDate ?? new Date();
-    const start = startDate > dateLimit ? dateLimit : startDate;
+    const start =
+      startDate > dateLimit
+        ? dateLimit
+        : startDate < dateStart
+          ? dateStart
+          : startDate;
     setShownMonth(civilDate(start.getFullYear(), start.getMonth(), 1));
-    setDraft(currentValue && currentValue <= dateLimit ? currentValue : null);
+    setDraft(
+      currentValue && currentValue >= dateStart && currentValue <= dateLimit
+        ? currentValue
+        : null,
+    );
     setView("days");
     setOpen(true);
   }
@@ -62,8 +76,13 @@ export function useDatePicker({
     setView("days");
   }
   function handleSelectYear(nextYear: number) {
+    if (nextYear < firstYear || nextYear > lastYear) return;
     const nextMonth =
-      nextYear === lastYear ? Math.min(month, lastMonth) : month;
+      nextYear === lastYear
+        ? Math.min(month, lastMonth)
+        : nextYear === firstYear
+          ? Math.max(month, firstMonth)
+          : month;
     setShownMonth(civilDate(nextYear, nextMonth, 1));
     setView("days");
   }
@@ -76,7 +95,7 @@ export function useDatePicker({
   }
   function handleSelectDay(day: number) {
     const selected = civilDate(year, month, day);
-    if (selected <= dateLimit) setDraft(selected);
+    if (selected >= dateStart && selected <= dateLimit) setDraft(selected);
   }
   function confirm(date: Date) {
     onChange(formatDate(date));
@@ -84,7 +103,7 @@ export function useDatePicker({
     handleCancel();
   }
   function handleAcceptDraft() {
-    if (draft && draft <= dateLimit) confirm(draft);
+    if (draft && draft >= dateStart && draft <= dateLimit) confirm(draft);
   }
   return {
     open,
@@ -100,6 +119,7 @@ export function useDatePicker({
     handleSelectYear,
     draft,
     dateLimit,
+    dateStart,
     shownMonth,
     calendarCells,
     displayValue,
